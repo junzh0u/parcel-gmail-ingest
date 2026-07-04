@@ -27,8 +27,9 @@ Parcel.app. Architecture, setup, and Gmail filters: see README.md.
 
 ## Testing
 
-Test parsing without deploying: stub the message
-(`{getSubject: () => ..., getPlainBody: () => ...}`) and `eval` `Code.js` in a
+Test parsing without deploying: stub `PropertiesService` (referenced at file
+top level) and the message
+(`{getSubject: () => ..., getPlainBody: () => ...}`), then `eval` `Code.js` in a
 Node harness, feeding it text extracted from a real `.eml` fixture. Simulate
 `getPlainBody()` by stripping HTML comments/style/script/tags and rendering
 `<b>`/`<strong>` as `*asterisks*`. Keep fixtures out of the repo — real

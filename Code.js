@@ -7,12 +7,17 @@
  *
  * Required script property (Project Settings → Script properties):
  *   PARCEL_API_KEY
+ * Optional overrides:
+ *   LABEL_INBOX (default parcel/inbox), LABEL_INGESTED (default parcel/ingested)
  */
 
 const PARCEL_API = 'https://api.parcel.app/external/add-delivery/';
 
-const LABEL_INBOX = 'parcel/inbox';
-const LABEL_INGESTED = 'parcel/ingested';
+const SCRIPT_PROPS = PropertiesService.getScriptProperties();
+
+// Overridable via script properties of the same name
+const LABEL_INBOX = SCRIPT_PROPS.getProperty('LABEL_INBOX') || 'parcel/inbox';
+const LABEL_INGESTED = SCRIPT_PROPS.getProperty('LABEL_INGESTED') || 'parcel/ingested';
 
 // Per carrier: subject pattern for the tracking number, Parcel carrier code,
 // and body pattern for the shipper name — first subject match wins.
@@ -106,7 +111,7 @@ function parseMessage(message) {
  * in parcel/inbox for the next run.
  */
 function addToParcel({ trackingNumber, carrierCode, description }) {
-  const apiKey = PropertiesService.getScriptProperties().getProperty('PARCEL_API_KEY');
+  const apiKey = SCRIPT_PROPS.getProperty('PARCEL_API_KEY');
   if (!apiKey) throw new Error('Missing PARCEL_API_KEY script property');
 
   const response = UrlFetchApp.fetch(PARCEL_API, {
@@ -140,7 +145,7 @@ function addToParcel({ trackingNumber, carrierCode, description }) {
 
 /** Load the set of tracking numbers already added to Parcel. */
 function loadAdded() {
-  const raw = PropertiesService.getScriptProperties().getProperty(PROP_KEY);
+  const raw = SCRIPT_PROPS.getProperty(PROP_KEY);
   if (!raw) return new Set();
   try {
     return new Set(JSON.parse(raw));
@@ -153,7 +158,7 @@ function loadAdded() {
 function saveAdded(set) {
   let numbers = Array.from(set);
   if (numbers.length > MAX_TRACKED) numbers = numbers.slice(-MAX_TRACKED);
-  PropertiesService.getScriptProperties().setProperty(PROP_KEY, JSON.stringify(numbers));
+  SCRIPT_PROPS.setProperty(PROP_KEY, JSON.stringify(numbers));
 }
 
 /** Return the Gmail label, creating it if missing. */

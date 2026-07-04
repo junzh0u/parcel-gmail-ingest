@@ -47,5 +47,7 @@ first run.
   for the next run; check the Executions tab in the Apps Script editor.
 - Newly added deliveries show "No data available" in Parcel until its server
   first polls the carrier — that's normal.
+- The label names default to `parcel/inbox` / `parcel/ingested`; override them
+  with `LABEL_INBOX` / `LABEL_INGESTED` script properties — no code edit needed.
 - `.clasp.json` (written by `clasp create`) ties the directory to a specific
   Apps Script project in your account, so it's gitignored.
