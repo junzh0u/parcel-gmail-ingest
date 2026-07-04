@@ -1,4 +1,4 @@
-# parcel-ingest
+# parcel-gmail-ingest
 
 Adds shipping notifications from Gmail to [Parcel.app](https://parcelapp.net) automatically.
 
