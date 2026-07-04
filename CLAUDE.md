@@ -21,6 +21,9 @@ Parcel.app. Architecture, setup, and Gmail filters: see README.md.
   sentence-case text (see the FedEx pattern comment in `Code.js`)
 - The Parcel API allows 20 requests/day including failures; keep
   `MAX_THREADS_PER_RUN` in sync with that budget
+- Gmail labels are thread-level — a reply re-surfaces a whole thread, so the
+  label swap is not the dedup; the persisted added-tracking-numbers set
+  (PropertiesService ring buffer) is
 
 ## Testing
 

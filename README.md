@@ -40,6 +40,9 @@ first run.
 - The Parcel API is rate-limited to 20 requests/day (failures included), so
   each run processes at most 20 threads and rejected tracking numbers are
   relabeled rather than retried.
+- Added tracking numbers are remembered in a script property (ring buffer of
+  the most recent 200), so a duplicate carrier email — or a reply re-surfacing
+  an already-ingested thread — never re-adds a delivery or burns the budget.
 - On auth or server errors the run aborts and threads stay in `parcel/inbox`
   for the next run; check the Executions tab in the Apps Script editor.
 - Newly added deliveries show "No data available" in Parcel until its server

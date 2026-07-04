@@ -41,6 +41,14 @@ const TRACKING_PATTERNS = [
 // Parcel rate limit is 20 requests/day (failures included) — cap each run
 const MAX_THREADS_PER_RUN = 20;
 
+// Dedup is this persistent added-set, NOT the labels — Gmail labels are
+// thread-level, so a reply re-surfaces a whole already-ingested thread, and
+// carriers can send the same tracking number in more than one email. Each
+// number is remembered once added; PropertiesService caps a value at 9 KB,
+// so the set is a ring buffer of the most recent additions.
+const PROP_KEY = 'ADDED_TRACKING_NUMBERS';
+const MAX_TRACKED = 200;
+
 /** Entry point for the time-driven trigger. */
 function ingest() {
   const inbox = getOrCreateLabel(LABEL_INBOX);
@@ -48,7 +56,7 @@ function ingest() {
 
   let added = 0;
   let skipped = 0;
-  const seen = new Set();
+  const seen = loadAdded();
   for (const thread of inbox.getThreads(0, MAX_THREADS_PER_RUN)) {
     for (const message of thread.getMessages()) {
       const parsed = parseMessage(message);
@@ -60,6 +68,7 @@ function ingest() {
       } else if (addToParcel(parsed)) {
         console.log(`Added ${parsed.trackingNumber} (${parsed.carrierCode}): ${parsed.description}`);
         seen.add(parsed.trackingNumber);
+        saveAdded(seen); // persist incrementally — a crash only risks the in-flight number
         added++;
       } else {
         skipped++;
@@ -127,6 +136,24 @@ function addToParcel({ trackingNumber, carrierCode, description }) {
     return false;
   }
   return true;
+}
+
+/** Load the set of tracking numbers already added to Parcel. */
+function loadAdded() {
+  const raw = PropertiesService.getScriptProperties().getProperty(PROP_KEY);
+  if (!raw) return new Set();
+  try {
+    return new Set(JSON.parse(raw));
+  } catch (e) {
+    return new Set();
+  }
+}
+
+/** Persist the added-set, keeping only the most recent MAX_TRACKED numbers. */
+function saveAdded(set) {
+  let numbers = Array.from(set);
+  if (numbers.length > MAX_TRACKED) numbers = numbers.slice(-MAX_TRACKED);
+  PropertiesService.getScriptProperties().setProperty(PROP_KEY, JSON.stringify(numbers));
 }
 
 /** Return the Gmail label, creating it if missing. */
