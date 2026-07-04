@@ -36,11 +36,12 @@ $clasp push -f
 
 if $first_deploy; then
     cat <<EOF
-Pushed. Finish setup in the Apps Script editor ($clasp open-script):
+Pushed. Finish setup in the Apps Script editor (opening now):
   1. Project Settings -> Script properties -> add PARCEL_API_KEY
   2. Run the install() function once (grants auth, creates the 15-min trigger)
   3. Gmail filter: from:mcinfo@ups.com subject:"UPS Ship Notification" -> label parcel/inbox
 EOF
+    $clasp open-script
 else
     echo "Done. Code updated; trigger and script properties unchanged."
 fi
