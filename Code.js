@@ -14,15 +14,29 @@ const PARCEL_API = 'https://api.parcel.app/external/add-delivery/';
 const LABEL_INBOX = 'parcel/inbox';
 const LABEL_INGESTED = 'parcel/ingested';
 
-// (subject pattern, Parcel carrier code) — first match wins. Carrier codes:
+// Per carrier: subject pattern for the tracking number, Parcel carrier code,
+// and body pattern for the shipper name — first subject match wins.
+// The shipper examples show getPlainBody() output, which renders bold HTML
+// as *asterisks* (stripped after capture). Carrier codes:
 // https://api.parcel.app/external/supported_carriers.json
 const TRACKING_PATTERNS = [
-  { pattern: /\b(1Z[A-Z0-9]{16})\b/, carrier: 'ups' },
+  {
+    // "UPS Ship Notification, Tracking Number 1Z..."
+    pattern: /\b(1Z[A-Z0-9]{16})\b/,
+    carrier: 'ups',
+    // "... Your package is on the way! From *PENSER SC* Estimated Delivery ..."
+    shipper: /From (.+?) Estimated Delivery/,
+  },
+  {
+    // "Your shipment is on the way 872693522600"
+    pattern: /\b(\d{12})\b/,
+    carrier: 'fedex',
+    // "... Your shipment from FITT USA, INC. is on the way. ..." — the
+    // capital Y skips the preheader "... for your shipment from FITT USA,
+    // INC.", which lacks the "is on the way" tail and would over-capture
+    shipper: /Your shipment from (.+?) is on the way/,
+  },
 ];
-
-// UPS body text: "... Your package is on the way! From *PENSER SC* Estimated
-// Delivery ..." — getPlainBody() renders bold HTML as *asterisks*
-const SHIPPER_RE = /From (.+?) Estimated Delivery/;
 
 // Parcel rate limit is 20 requests/day (failures included) — cap each run
 const MAX_THREADS_PER_RUN = 20;
@@ -60,15 +74,15 @@ function ingest() {
 /** Extract {trackingNumber, carrierCode, description} from a message, or null. */
 function parseMessage(message) {
   const subject = message.getSubject();
-  for (const { pattern, carrier } of TRACKING_PATTERNS) {
+  for (const { pattern, carrier, shipper } of TRACKING_PATTERNS) {
     const match = subject.match(pattern);
     if (match) {
       const body = message.getPlainBody().replace(/\s+/g, ' ');
-      const shipper = body.match(SHIPPER_RE);
+      const shipperMatch = body.match(shipper);
       return {
         trackingNumber: match[1],
         carrierCode: carrier,
-        description: shipper ? shipper[1].replace(/\*/g, '').trim() : subject,
+        description: shipperMatch ? shipperMatch[1].replace(/\*/g, '').trim() : subject,
       };
     }
   }

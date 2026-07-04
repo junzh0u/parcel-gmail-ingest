@@ -6,8 +6,9 @@ A Gmail filter labels carrier emails `parcel/inbox`; this Google Apps Script
 polls that label every 15 minutes (time-driven trigger), extracts the tracking
 number from the subject, adds the delivery via the
 [Parcel API](https://parcelapp.net/help/api-add-delivery.html), and relabels
-the thread `parcel/ingested`. Currently recognizes UPS (`1Z...` in the subject
-of `UPS Ship Notification` emails); add more carriers by extending
+the thread `parcel/ingested`. Currently recognizes UPS (`1Z...` in
+`UPS Ship Notification` subjects) and FedEx (12 digits in
+`Your shipment is on the way` subjects); add more carriers by extending
 `TRACKING_PATTERNS` in `Code.js`
 (codes: <https://api.parcel.app/external/supported_carriers.json>).
 
@@ -27,9 +28,10 @@ first run.
    [script.google.com](https://script.google.com) by hand.)
 3. **API key**: in the Apps Script editor → Project Settings →
    Script properties → add `PARCEL_API_KEY`.
-4. **Gmail filter**: `from:mcinfo@ups.com subject:"UPS Ship Notification"` →
-   apply label `parcel/inbox` (the labels are auto-created by the script if
-   they don't exist yet).
+4. **Gmail filters** → apply label `parcel/inbox` (the labels are
+   auto-created by the script if they don't exist yet):
+   - UPS: `from:mcinfo@ups.com subject:"UPS Ship Notification"`
+   - FedEx: `from:TrackingUpdates@fedex.com subject:"Your shipment is on the way"`
 5. **Install the trigger**: in the editor, run the `install` function once —
    the first run prompts for authorization and creates the 15-minute trigger.
 
