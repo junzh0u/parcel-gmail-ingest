@@ -1,11 +1,10 @@
-# Lint + tests (non-destructive)
+# Run parsing regression tests (a Code.js syntax error fails the suite at load)
 check:
-    node --check Code.js
-    node test.js
+    bun run test.js
 
-# Run parsing regression tests
+# Alias for check
 test:
-    node test.js
+    bun run test.js
 
 # Push to Apps Script (runs tests first)
 deploy:

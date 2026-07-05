@@ -27,7 +27,7 @@ Parcel.app. Architecture, setup, and Gmail filters: see README.md.
 
 ## Testing
 
-- `just check` (or `node test.js`) — regression tests for the parsing and the
+- `just check` (or `bun run test.js`) — regression tests for the parsing and the
   dedup ring buffer; `deploy.sh` runs them before every push. The harness
   stubs `PropertiesService` and the message object, then `eval`s `Code.js`.
 - When adding a carrier, add a test case: extract text from a real `.eml`,

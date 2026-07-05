@@ -5,12 +5,12 @@ script_dir="${0:A:h}"
 cd "$script_dir"
 
 # Don't push code that fails the regression tests
-if (( $+commands[node] )); then
+if (( $+commands[bun] )); then
+    bun run test.js
+elif (( $+commands[node] )); then
     node test.js
-elif (( $+commands[bun] )); then
-    bun test.js
 else
-    echo "Warning: no node/bun on PATH, skipping tests" >&2
+    echo "Warning: no bun/node on PATH, skipping tests" >&2
 fi
 
 # Pick a clasp runner: PATH install, else ad hoc via bunx/npx
