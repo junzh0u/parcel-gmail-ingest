@@ -7,7 +7,8 @@ polls that label every 15 minutes (time-driven trigger), extracts the tracking
 number from the subject, adds the delivery via the
 [Parcel API](https://parcelapp.net/help/api-add-delivery.html), and relabels
 the thread `parcel/ingested`. Currently recognizes UPS (`1Z...` in
-`UPS Ship Notification` subjects) and FedEx (12 digits in
+`UPS Ship Notification` subjects), USPS (22 digits starting `9x` in
+`Expected Delivery` subjects), and FedEx (12 digits in
 `Your shipment is on the way` subjects); add more carriers by extending
 `TRACKING_PATTERNS` in `Code.js`
 (codes: <https://api.parcel.app/external/supported_carriers.json>).
@@ -31,6 +32,7 @@ first run.
 4. **Gmail filters** → apply label `parcel/inbox` (the labels are
    auto-created by the script if they don't exist yet):
    - UPS: `from:mcinfo@ups.com subject:"UPS Ship Notification"`
+   - USPS: `from:auto-reply@tracking.usps.com subject:"Expected Delivery"`
    - FedEx: `from:TrackingUpdates@fedex.com subject:"Your shipment is on the way"`
 5. **Install the trigger**: in the editor, run the `install` function once —
    the first run prompts for authorization and creates the 15-minute trigger.

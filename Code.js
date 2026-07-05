@@ -33,6 +33,13 @@ const TRACKING_PATTERNS = [
     shipper: /From (.+?) Estimated Delivery/,
   },
   {
+    // "USPS® Expected Delivery on Thursday, July 2, 2026 arriving by 9:00pm 9400150105795086069038"
+    pattern: /\b(9[2-5]\d{20})\b/,
+    carrier: 'usps',
+    // "... Tracking Number: 9400... Package Shipped from: *STAMPS.COM* *Expected Delivery On* ..."
+    shipper: /Package Shipped from: (.+?) \*Expected Delivery/,
+  },
+  {
     // "Your shipment is on the way 872693522600"
     pattern: /\b(\d{12})\b/,
     carrier: 'fedex',
