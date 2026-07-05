@@ -27,10 +27,11 @@ Parcel.app. Architecture, setup, and Gmail filters: see README.md.
 
 ## Testing
 
-Test parsing without deploying: stub `PropertiesService` (referenced at file
-top level) and the message
-(`{getSubject: () => ..., getPlainBody: () => ...}`), then `eval` `Code.js` in a
-Node harness, feeding it text extracted from a real `.eml` fixture. Simulate
-`getPlainBody()` by stripping HTML comments/style/script/tags and rendering
-`<b>`/`<strong>` as `*asterisks*`. Keep fixtures out of the repo — real
-carrier emails contain personal addresses.
+- `just check` (or `node test.js`) — regression tests for the parsing and the
+  dedup ring buffer; `deploy.sh` runs them before every push. The harness
+  stubs `PropertiesService` and the message object, then `eval`s `Code.js`.
+- When adding a carrier, add a test case: extract text from a real `.eml`,
+  then sanitize it (fake tracking number, generic shipper, no names or
+  addresses) before committing. Never commit real carrier emails. Simulate
+  `getPlainBody()` by stripping HTML comments/style/script/tags and rendering
+  `<b>`/`<strong>` as `*asterisks*`.

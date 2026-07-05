@@ -11,7 +11,9 @@ the thread `parcel/ingested`. Currently recognizes UPS (`1Z...` in
 `Expected Delivery` subjects), and FedEx (12 digits in
 `Your shipment is on the way` subjects); add more carriers by extending
 `TRACKING_PATTERNS` in `Code.js`
-(codes: <https://api.parcel.app/external/supported_carriers.json>).
+(codes: <https://api.parcel.app/external/supported_carriers.json>) and adding
+a sanitized fixture to `test.js` (`node test.js` to run; `deploy.sh` runs the
+tests before every push).
 
 Running as an Apps Script inside the Gmail account means no OAuth client,
 refresh token, or hosting to manage — authorization is a one-click grant on
