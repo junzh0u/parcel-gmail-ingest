@@ -37,6 +37,8 @@ if [[ -f .clasp.json ]]; then
 else
     echo "Creating Apps Script project"
     $clasp create --type standalone --title parcel-ingest
+    # clasp create overwrites the local manifest with the remote default — restore ours
+    git checkout -- appsscript.json
     first_deploy=true
 fi
 
